@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Layout from "../components/Layout";
+import toast from "react-hot-toast";
 
 function Billing() {
   const [products, setProducts] = useState([]);
@@ -45,10 +46,10 @@ function Billing() {
         items,
       });
 
-      alert("Bill Created ✅");
+      toast.success("Bill Created ✅");
       console.log(res.data);
     } catch (err) {
-      alert("Error creating bill ❌");
+      toast.error("Something went wrong ❌");
     }
   };
 

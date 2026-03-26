@@ -2,9 +2,15 @@ const express = require("express");
 const router = express.Router();
 const productController = require("../controllers/productController");
 
-router.post("/add", productController.addProduct);
-router.get("/", productController.getProducts);
-router.put("/update/:id", productController.updateProduct);
-router.delete("/delete/:id", productController.deleteProduct);
+const auth = require("../middleware/authMiddleware");
+const role = require("../middleware/roleMiddleware");
+
+// Protected routes
+router.post("/add", auth, role("admin"), productController.addProduct);
+router.put("/update/:id", auth, role("admin"), productController.updateProduct);
+router.delete("/delete/:id", auth, role("admin"), productController.deleteProduct);
+
+// Public route
+router.get("/", auth, productController.getProducts);
 
 module.exports = router;
