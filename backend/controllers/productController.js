@@ -1,17 +1,17 @@
 const Product = require("../models/Product");
 
-// ➕ ADD PRODUCT
 exports.addProduct = async (req, res) => {
   try {
     const { name, price, stock_quantity } = req.body;
 
-    const existingproduct = await Product.findOne({ where: { name } });
-    if (existingproduct) {
-      return res.status(400).json({ message: "Product already exists" });
+    if (!name || !price) {
+      return res.status(400).json({ message: "Name & Price required" });
     }
-    const existingmobile = await Customer.findOne({ where: { mobile } });
-    if (existingmobile) {
-      return res.status(400).json({ message: "Customer already exists" });
+
+    const existing = await Product.findOne({ where: { name } });
+
+    if (existing) {
+      return res.status(400).json({ message: "Product already exists" });
     }
 
     const product = await Product.create({
@@ -20,13 +20,14 @@ exports.addProduct = async (req, res) => {
       stock_quantity,
     });
 
-    res.json({ message: "Product added", product });
+    res.status(201).json(product);
+
   } catch (error) {
+    console.log("ADD PRODUCT ERROR:", error); 
     res.status(500).json({ error: error.message });
   }
 };
 
-// 📋 GET ALL PRODUCTS
 exports.getProducts = async (req, res) => {
   try {
     const products = await Product.findAll();
@@ -36,7 +37,6 @@ exports.getProducts = async (req, res) => {
   }
 };
 
-// ✏️ UPDATE PRODUCT
 exports.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -50,7 +50,6 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
-// ❌ DELETE PRODUCT
 exports.deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;

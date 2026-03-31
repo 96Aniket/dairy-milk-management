@@ -9,15 +9,27 @@ function Billing() {
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [items, setItems] = useState([]);
 
-  // fetch products
   const fetchProducts = async () => {
-    const res = await axios.get("http://localhost:5000/api/products");
+    const token = localStorage.getItem("token");
+
+    const res = await axios.get("http://localhost:5000/api/products", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
     setProducts(res.data);
   };
 
-  // fetch customers
   const fetchCustomers = async () => {
-    const res = await axios.get("http://localhost:5000/api/customers");
+    const token = localStorage.getItem("token");
+
+    const res = await axios.get("http://localhost:5000/api/customers", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
     setCustomers(res.data);
   };
 
@@ -26,30 +38,37 @@ function Billing() {
     fetchCustomers();
   }, []);
 
-  // add item row
   const addItem = () => {
     setItems([...items, { product_id: "", quantity: 1 }]);
   };
 
-  // handle change
   const handleChange = (index, field, value) => {
     const updated = [...items];
     updated[index][field] = value;
     setItems(updated);
   };
 
-  // create bill
   const createBill = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/api/billing/create", {
-        customer_id: selectedCustomer,
-        items,
-      });
+      const token = localStorage.getItem("token");
 
-      toast.success("Bill Created ✅");
+      const res = await axios.post(
+        "http://localhost:5000/api/billing/create",
+        {
+          customer_id: selectedCustomer,
+          items,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success("Bill Created");
       console.log(res.data);
     } catch (err) {
-      toast.error("Something went wrong ❌");
+      toast.error("Something went wrong");
     }
   };
 
@@ -58,7 +77,6 @@ function Billing() {
       <div className="p-5">
         <h1 className="text-2xl font-bold mb-4">Billing</h1>
 
-        {/* CUSTOMER SELECT */}
         <div className="bg-white p-5 rounded-xl shadow mb-4">
           <select
             className="border p-2 w-full mb-3 rounded"
@@ -80,7 +98,6 @@ function Billing() {
           </button>
         </div>
 
-        {/* ITEMS */}
         {items.map((item, index) => (
           <div key={index} className="mb-2">
             <select
@@ -101,18 +118,17 @@ function Billing() {
               type="number"
               className="border p-2"
               value={item.quantity}
-              onChange={(e) => handleChange(index, "quantity", e.target.value)}
+              onChange={(e) =>
+                handleChange(index, "quantity", e.target.value)
+              }
             />
           </div>
         ))}
 
-        {/* ADD ITEM */}
-        <button onClick={addItem} className="bg-blue-500 text-white p-2 mr-2">
-          Add Product
-        </button>
-
-        {/* CREATE BILL */}
-        <button onClick={createBill} className="bg-green-500 text-white p-2">
+        <button
+          onClick={createBill}
+          className="bg-green-500 text-white p-2"
+        >
           Generate Bill
         </button>
       </div>

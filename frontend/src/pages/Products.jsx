@@ -8,9 +8,15 @@ function Products() {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
 
-  // GET PRODUCTS
   const fetchProducts = async () => {
-    const res = await axios.get("http://localhost:5000/api/products");
+    const token = localStorage.getItem("token");
+
+    const res = await axios.get("http://localhost:5000/api/products", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
     setProducts(res.data);
   };
 
@@ -18,13 +24,22 @@ function Products() {
     fetchProducts();
   }, []);
 
-  // ADD PRODUCT
   const addProduct = async () => {
-    await axios.post("http://localhost:5000/api/products/add", {
-      name,
-      price,
-      stock_quantity: stock,
-    });
+    const token = localStorage.getItem("token");
+
+    await axios.post(
+      "http://localhost:5000/api/products/add",
+      {
+        name,
+        price,
+        stock_quantity: stock,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     fetchProducts();
     setName("");
@@ -32,9 +47,18 @@ function Products() {
     setStock("");
   };
 
-  // DELETE PRODUCT
   const deleteProduct = async (id) => {
-    await axios.delete(`http://localhost:5000/api/products/delete/${id}`);
+    const token = localStorage.getItem("token");
+
+    await axios.delete(
+      `http://localhost:5000/api/products/delete/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     fetchProducts();
   };
 
@@ -43,7 +67,6 @@ function Products() {
       <div className="p-5">
         <h1 className="text-2xl font-bold mb-4">Products</h1>
 
-        {/* FORM */}
         <div className="mb-5">
           <input
             placeholder="Product Name"
@@ -68,7 +91,6 @@ function Products() {
           </button>
         </div>
 
-        {/* TABLE */}
         <table className="w-full bg-white rounded-xl shadow overflow-hidden">
           <thead className="bg-gray-200">
             <tr>

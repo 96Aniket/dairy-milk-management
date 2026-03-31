@@ -31,7 +31,10 @@ exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    const user = await User.findOne({ where: { username } });
+    const user = await User.findOne({
+      where: { username },
+      attributes: ["id", "username", "password", "role"],
+    });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

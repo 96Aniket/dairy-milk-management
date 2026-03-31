@@ -37,7 +37,7 @@ app.use("/api/customers", customerRoutes);
 app.use("/api/billing", billingRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-sequelize.sync()
+sequelize.sync({ alter: true })
   .then(() => console.log("Database connected"))
   .catch(err => console.log(err));
 
