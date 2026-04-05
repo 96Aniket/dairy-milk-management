@@ -87,6 +87,11 @@ function Customers() {
   const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
 
   const addCustomer = async () => {
+    if (!name || !mobile) {
+      toast.error("Name & Mobile required");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
 
@@ -116,7 +121,6 @@ function Customers() {
   };
 
   const exportToExcel = () => {
-    // 🔥 export filtered + paginated data (ya full filtered)
     const dataToExport = filteredCustomers.map((c) => ({
       Name: c.name,
       Mobile: c.mobile,
@@ -159,48 +163,55 @@ function Customers() {
 
   return (
     <Layout>
-      <div className="p-5">
-        <input
-          placeholder="Search by name or mobile..."
-          className="border p-2 mb-3 w-full rounded-lg"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button
-          onClick={exportToExcel}
-          className="bg-purple-600 text-white px-4 py-2 rounded-lg mb-3"
-        >
-          Download Excel
-        </button>
+      <div className="p-5 min-h-screen bg-gray-100 dark:bg-gray-900 text-black dark:text-white">
+        {/* SEARCH + EXPORT */}
+        <div className="flex flex-wrap gap-3 mb-3">
+          <input
+            placeholder="Search by name or mobile..."
+            className="border dark:border-gray-600 bg-white dark:bg-gray-800 text-black dark:text-white p-2 rounded-lg w-full md:w-1/2"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+          <button
+            onClick={exportToExcel}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
+          >
+            Download Excel
+          </button>
+        </div>
+
         <h1 className="text-2xl font-bold mb-4">Customers</h1>
 
         {/* FORM */}
-        <div className="mb-5">
+        <div className="mb-5 bg-white dark:bg-gray-800 p-4 rounded-xl shadow flex flex-wrap gap-3">
           <input
             placeholder="Customer Name"
-            className="border p-2 mr-2"
+            className="border dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
 
           <input
             placeholder="Mobile"
-            className="border p-2 mr-2"
+            className="border dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded"
             value={mobile}
             onChange={(e) => setMobile(e.target.value)}
           />
 
           <input
             placeholder="Address"
-            className="border p-2 mr-2"
+            className="border dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
 
           <button
             onClick={editingId ? updateCustomer : addCustomer}
-            className={`text-white p-2 ${
-              editingId ? "bg-blue-500" : "bg-green-500"
+            className={`text-white px-4 py-2 rounded ${
+              editingId
+                ? "bg-blue-500 hover:bg-blue-600"
+                : "bg-green-500 hover:bg-green-600"
             }`}
           >
             {editingId ? "Update" : "Add"}
@@ -208,8 +219,8 @@ function Customers() {
         </div>
 
         {/* TABLE */}
-        <table className="w-full bg-white rounded-xl shadow overflow-hidden">
-          <thead className="bg-gray-200">
+        <table className="w-full rounded-xl shadow overflow-hidden bg-white dark:bg-gray-800">
+          <thead className="bg-gray-200 dark:bg-gray-700">
             <tr>
               <th className="p-3">Name</th>
               <th>Mobile</th>
@@ -220,21 +231,25 @@ function Customers() {
 
           <tbody>
             {currentCustomers.map((c) => (
-              <tr key={c.id} className="text-center border-t">
+              <tr
+                key={c.id}
+                className="text-center border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
                 <td className="p-3">{c.name}</td>
                 <td>{c.mobile}</td>
                 <td>{c.address}</td>
+
                 <td>
                   <button
                     onClick={() => editCustomer(c)}
-                    className="bg-yellow-500 text-white px-3 py-1 rounded mr-2"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded mr-2"
                   >
                     Edit
                   </button>
 
                   <button
                     onClick={() => deleteCustomer(c.id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded"
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
                   >
                     Delete
                   </button>
@@ -243,13 +258,17 @@ function Customers() {
             ))}
           </tbody>
         </table>
+
+        {/* PAGINATION */}
         <div className="mt-4 flex justify-center gap-2">
           {[...Array(totalPages)].map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
               className={`px-3 py-1 rounded ${
-                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+                currentPage === i + 1
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 dark:bg-gray-700 dark:text-white"
               }`}
             >
               {i + 1}

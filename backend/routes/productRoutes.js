@@ -9,6 +9,7 @@ const role = require("../middleware/roleMiddleware");
 router.post("/add", auth, productController.addProduct);
 router.put("/update/:id", auth, productController.updateProduct);
 router.delete("/delete/:id", auth, productController.deleteProduct);
+router.put("/add-stock/:id", auth, productController.addStock);
 
 // Public route
 router.get("/", auth, productController.getProducts);

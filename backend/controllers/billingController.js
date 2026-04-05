@@ -1,7 +1,6 @@
 const Bill = require("../models/Bill");
 const BillItem = require("../models/BillItem");
 const Product = require("../models/Product");
-const generateInvoice = require("./invoiceGenerator");
 const Customer = require("../models/Customer");
 
 // CREATE BILL
@@ -47,29 +46,29 @@ exports.createBill = async (req, res) => {
       await product.save();
     }
 
-    // ✅ FIXED: sab yaha andar aayega
-    const customer = await Customer.findByPk(customer_id);
-
-    const invoiceItems = [];
-
-    for (let item of items) {
-      const product = await Product.findByPk(item.product_id);
-
-      invoiceItems.push({
-        name: product.name,
-        quantity: item.quantity,
-        price: product.price,
-      });
-    }
-
-    const filePath = generateInvoice(bill, invoiceItems, customer);
-
-    res.json({
-      message: "Bill created",
+    res.status(200).json({
+      message,
       bill,
       invoice: filePath,
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
+exports.getBills = async (req, res) => {
+  try {
+    const bills = await Bill.findAll({
+      include: [
+        {
+          model: BillItem,
+          include: [Product],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.json(bills);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
